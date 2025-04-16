@@ -1,0 +1,75 @@
+You are an expert software developer specializing in full-stack web application development with a strong focus on AI integration and location-based services. Your goal is to generate the necessary code and instructions for building a website that connects users with nearby legal service providers, enhanced by AI-powered filtering and ranking.
+
+The website should have the following functionalities:
+
+1.  **User Location Detection:**
+    * Implement a mechanism to accurately determine the user's current location (using browser geolocation if permission is granted, or allow manual input of location).
+
+2.  **Service Provider Database:**
+    * Create a data structure (e.g., a list of dictionaries or a more robust database schema) to store information about legal service providers. Each entry should include:
+        * Name of the service provider (e.g., "XYZ Law Firm", "John Doe - Attorney at Law").
+        * Types of legal services offered (e.g., "Family Law", "Criminal Defense", "Corporate Law", "Real Estate Law"). Allow for multiple selections.
+        * Contact information (e.g., phone number, email address, website).
+        * Address (including latitude and longitude for distance calculations).
+        * A brief description or profile of the service provider.
+        * AI-relevant attributes for filtering and ranking (e.g., client reviews/ratings, years of experience, specialization depth in specific areas).
+
+3.  **Nearby Service Provider Search (30km Radius):**
+    * Develop a function that, given the user's location (latitude and longitude), retrieves all legal service providers from the database within a 30km radius.
+    * Implement a distance calculation function (using the Haversine formula or a similar method for accuracy).
+
+4.  **AI-Powered Filtering and Ranking:**
+    * Integrate an AI model (you will need to specify how this AI will be implemented - e.g., using a pre-trained model, a simple rule-based system initially, or with the intention to train a custom model later).
+    * The AI should take the list of nearby service providers (within 30km) and the user's potential needs (which could be implicitly understood through the service types they might be looking for on the website or explicitly stated in a future iteration) and filter and rank them based on relevance and quality.
+    * For the initial phase, focus on ranking based on available attributes like client reviews (if available), specialization in relevant areas, and potentially years of experience.
+    * The AI should output the top 3 service providers from the filtered and ranked list.
+
+5.  **Fallback Search (60km Radius):**
+    * Implement a condition that checks if any service providers are found within the initial 30km radius.
+    * If no providers are found within 30km, execute a secondary search to retrieve service providers within a 60km radius of the user's location.
+    * Apply the same AI-powered filtering and ranking (as described in point 4) to this list and present the top 3 results.
+
+6.  **Displaying Results:**
+    * Design a user interface to clearly display the top 3 service providers. For each provider, show:
+        * Name
+        * Brief description
+        * Key services offered
+        * Contact information
+        * Distance from the user
+    * Include a visual indication of their ranking (e.g., "Top 1", "Top 2", "Top 3").
+
+**Specific Instructions for Replit:**
+
+* Start by creating the basic HTML structure for the website.
+* Implement the JavaScript for user location detection and displaying the results.
+* Define the initial data structure for the legal service providers directly within the code (for prototyping). Later, you might consider integrating with a database like Supabase or a simple JSON file.
+* For the AI-powered filtering and ranking in this initial phase, you can simulate a simple ranking algorithm in JavaScript. For example, prioritize providers with more positive (simulated) reviews or those that explicitly list the legal service type the user might be interested in (you can assume a basic keyword matching for now).
+* Implement the logic for the 30km and 60km radius searches and the fallback mechanism.
+* Ensure the displayed information is user-friendly and easy to understand.
+
+**Example Scenario to Consider:**
+
+A user in Salem, Tamil Nadu, searches for "Divorce Lawyer".
+
+* **Step 1:** The website detects their location as Salem, Tamil Nadu.
+* **Step 2:** It searches for legal service providers within a 30km radius of Salem who offer "Family Law" or related services.
+* **Step 3:** The AI filters and ranks these providers based on (simulated) reviews, experience in family law, etc., and identifies the top 3.
+* **Step 4:** These top 3 providers are displayed to the user.
+
+If no "Family Law" providers are found within 30km, the system should then:
+
+* **Step 5:** Search for providers within a 60km radius of Salem offering "Family Law" services.
+* **Step 6:** The AI filters and ranks these (within 60km) and presents the top 3.
+
+**Output Expectations from Replit:**
+
+Replit should generate the following:
+
+* HTML (`index.html`) file with the basic website structure.
+* JavaScript (`script.js`) file containing the logic for location detection, distance calculation, data handling, the simulated AI filtering/ranking, and displaying results.
+* Potentially a CSS (`style.css`) file for basic styling (though the primary focus should be on functionality first).
+* Clear comments within the code explaining different sections and functionalities.
+* Guidance or comments on how to expand the AI capabilities in the future (e.g., integrating with a natural language processing model).
+* Instructions on how to run the initial version of the application within the Replit environment.
+
+Remember to keep the initial implementation relatively simple and focus on getting the core location-based search and the basic AI-powered ranking logic working. You can iterate and enhance the AI and the user interface in subsequent steps.
