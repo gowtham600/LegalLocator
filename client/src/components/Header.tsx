@@ -1,30 +1,65 @@
+import { useState } from "react";
 import { Link } from "wouter";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { GavelIcon } from "lucide-react";
 
 export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+  
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+  
+  const MenuItems = () => (
+    <>
+      <Link href="/">
+        <Button variant="ghost" onClick={closeMenu}>Home</Button>
+      </Link>
+      <Link href="/about">
+        <Button variant="ghost" onClick={closeMenu}>About</Button>
+      </Link>
+      <Link href="/contact">
+        <Button variant="ghost" onClick={closeMenu}>Contact</Button>
+      </Link>
+    </>
+  );
+  
   return (
-    <header className="bg-gradient-to-r from-primary to-primary/80 text-white shadow-md">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center mb-4 md:mb-0">
-            <Link href="/">
-              <a className="text-2xl font-bold tracking-tight hover:text-white/90 transition-colors">
-                Legal<span className="text-white">Finder</span>
-              </a>
-            </Link>
+    <header className="bg-background border-b border-border shadow-sm">
+      <div className="container mx-auto flex justify-between items-center py-4 px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="p-1.5 bg-primary rounded-md">
+            <GavelIcon className="h-5 w-5 text-primary-foreground" />
           </div>
-          
-          <nav className="flex space-x-6">
-            <Link href="/">
-              <a className="font-medium hover:text-white/90 transition-colors">Home</a>
-            </Link>
-            <Link href="/about">
-              <a className="font-medium hover:text-white/90 transition-colors">About</a>
-            </Link>
-            <Link href="/contact">
-              <a className="font-medium hover:text-white/90 transition-colors">Contact</a>
-            </Link>
+          <span className="font-bold text-xl">LegalLocator</span>
+        </Link>
+        
+        {isMobile ? (
+          <div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X /> : <Menu />}
+            </Button>
+            
+            {isMenuOpen && (
+              <div className="absolute top-16 right-0 left-0 bg-background z-50 py-4 px-4 border-b border-border shadow-md">
+                <nav className="flex flex-col space-y-2">
+                  <MenuItems />
+                </nav>
+              </div>
+            )}
+          </div>
+        ) : (
+          <nav className="flex items-center space-x-1">
+            <MenuItems />
           </nav>
-        </div>
+        )}
       </div>
     </header>
   );

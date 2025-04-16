@@ -1,80 +1,192 @@
+import { Check, Shield, Scale, PieChart, Award, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { CheckCircle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function About() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <section className="mb-12">
-          <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-            About LegalFinder
-          </h1>
-          
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg text-gray-700 mb-6">
-              LegalFinder is a cutting-edge platform designed to connect individuals with qualified legal service providers in their vicinity. Our mission is to make quality legal services more accessible to everyone, regardless of their location or background.
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="py-16 px-4 bg-gradient-to-br from-primary/10 to-primary/5">
+          <div className="container mx-auto text-center max-w-4xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+              About LegalLocator
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Connecting people with the legal help they need, when they need it most.
             </p>
-            
-            <p className="text-lg text-gray-700 mb-6">
-              Founded in 2024, our team of legal experts and technologists created this platform to bridge the gap between those seeking legal assistance and professionals who can provide it. We understand that finding the right legal help can be overwhelming, which is why we've developed an intelligent matching system that considers your specific needs and location.
-            </p>
-            
-            <div className="my-10 bg-gray-50 rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Our Core Values</h2>
-              
-              <ul className="space-y-4">
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Accessibility</h3>
-                    <p className="text-gray-600">We believe everyone deserves access to quality legal services regardless of their location.</p>
-                  </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Trust</h3>
-                    <p className="text-gray-600">We carefully vet all legal service providers on our platform to ensure they meet our high standards.</p>
-                  </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Innovation</h3>
-                    <p className="text-gray-600">Our AI-powered matching algorithm ensures you find the most relevant legal help for your specific situation.</p>
-                  </div>
-                </li>
-                
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Diversity</h3>
-                    <p className="text-gray-600">We embrace and promote diversity among our legal service providers and the communities we serve.</p>
-                  </div>
-                </li>
-              </ul>
+            <div className="flex flex-wrap justify-center gap-4 mb-8">
+              <div className="flex items-center">
+                <Check className="h-5 w-5 text-primary mr-2" />
+                <span className="text-gray-700">Data-driven matching</span>
+              </div>
+              <div className="flex items-center">
+                <Check className="h-5 w-5 text-primary mr-2" />
+                <span className="text-gray-700">Location-based results</span>
+              </div>
+              <div className="flex items-center">
+                <Check className="h-5 w-5 text-primary mr-2" />
+                <span className="text-gray-700">AI-powered ranking</span>
+              </div>
+              <div className="flex items-center">
+                <Check className="h-5 w-5 text-primary mr-2" />
+                <span className="text-gray-700">Verified providers</span>
+              </div>
             </div>
-            
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">How It Works</h2>
-            
-            <p className="text-lg text-gray-700 mb-4">
-              LegalFinder uses your location and service needs to find the most relevant legal service providers near you. Our intelligent ranking system considers factors such as proximity, expertise, reviews, and experience to present you with the best options.
+          </div>
+        </section>
+        
+        {/* Mission Section */}
+        <section className="py-16 px-4">
+          <div className="container mx-auto max-w-5xl">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
+                <p className="text-gray-600 mb-4">
+                  At LegalLocator, we believe everyone deserves access to quality legal services. Finding the right legal help shouldn't be complicated or stressful, especially during difficult times.
+                </p>
+                <p className="text-gray-600 mb-4">
+                  Our mission is to simplify this process by connecting individuals with legal service providers who are not only qualified but also conveniently located and well-suited to their specific needs.
+                </p>
+                <p className="text-gray-600">
+                  Through innovative technology and a commitment to service excellence, we strive to make legal help more accessible to all.
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <div className="w-72 h-72 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Scale className="w-32 h-32 text-primary/70" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <Separator className="max-w-5xl mx-auto" />
+        
+        {/* Features Section */}
+        <section className="py-16 px-4">
+          <div className="container mx-auto text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Why Choose LegalLocator</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto">
+              Our platform uses advanced technology to ensure you find the right legal help quickly and efficiently.
             </p>
+          </div>
+          
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card>
+                <CardHeader>
+                  <Shield className="h-12 w-12 text-primary mb-2" />
+                  <CardTitle>Trusted Providers</CardTitle>
+                  <CardDescription>
+                    All legal service providers undergo a verification process before joining our platform.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    We verify credentials, experience, and client reviews to ensure you're connected with qualified professionals.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <PieChart className="h-12 w-12 text-primary mb-2" />
+                  <CardTitle>Smart Matching</CardTitle>
+                  <CardDescription>
+                    Our AI-powered algorithm finds the best match for your specific legal needs.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    By analyzing multiple factors including expertise, location, and availability, we provide personalized recommendations.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <Users className="h-12 w-12 text-primary mb-2" />
+                  <CardTitle>Community Focused</CardTitle>
+                  <CardDescription>
+                    We're committed to improving access to legal services in all communities.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">
+                    Our platform is designed to bridge gaps in legal service availability, especially in underserved areas.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+        
+        {/* Team Values Section */}
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="container mx-auto max-w-5xl">
+            <h2 className="text-3xl font-bold mb-12 text-center">Our Values</h2>
             
-            <p className="text-lg text-gray-700 mb-6">
-              Whether you need assistance with family law, criminal defense, corporate matters, or any other legal service, our platform helps you find qualified professionals who can address your specific needs efficiently and effectively.
-            </p>
-            
-            <div className="bg-primary/10 p-6 rounded-lg border border-primary/20 mt-8">
-              <h3 className="text-xl font-semibold mb-2 text-primary">Join Our Network</h3>
-              <p className="text-gray-700">
-                Are you a legal service provider interested in joining our platform? Contact us to learn more about how LegalFinder can help you connect with clients in your area.
-              </p>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Award className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Excellence</h3>
+                  <p className="text-gray-600">
+                    We are committed to excellence in every aspect of our service, from the technology we develop to the support we provide.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Integrity</h3>
+                  <p className="text-gray-600">
+                    We maintain the highest standards of integrity in our operations and relationships with users and service providers.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Inclusion</h3>
+                  <p className="text-gray-600">
+                    We believe in creating an inclusive platform that serves diverse communities and needs equally.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-4">
+                <div className="flex-shrink-0">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Scale className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Justice</h3>
+                  <p className="text-gray-600">
+                    We are dedicated to improving access to justice by making legal services more accessible to all.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
