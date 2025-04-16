@@ -117,12 +117,20 @@ export class MemStorage implements IStorage {
     const nearbyProviders = providersWithDistance.filter(item => item.distance <= radius);
     
     // Filter by service type if specified
-    if (serviceType && serviceType !== "") {
-      return nearbyProviders.filter(item => 
-        item.provider.services.some(service => 
-          service.toLowerCase().includes(serviceType.toLowerCase())
-        )
-      );
+    if (serviceType && serviceType !== "" && serviceType !== "all") {
+      return nearbyProviders.filter(item => {
+        try {
+          // Parse JSON string to get services array
+          const services = JSON.parse(item.provider.services);
+          return Array.isArray(services) && 
+            services.some((service: string) => 
+              service.toLowerCase().includes(serviceType.toLowerCase())
+            );
+        } catch (error) {
+          console.error("Error parsing services:", error);
+          return false;
+        }
+      });
     }
     
     return nearbyProviders;
