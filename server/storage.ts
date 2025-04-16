@@ -5,7 +5,9 @@ import {
   type LegalServiceProvider, 
   type InsertLegalServiceProvider, 
   type SearchRequest, 
-  type ProviderWithDistance
+  type ProviderWithDistance,
+  type ContactSubmission,
+  type InsertContactSubmission
 } from "@shared/schema";
 
 // Constants for search radii
@@ -57,17 +59,37 @@ function deg2rad(deg: number): number {
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private legalServiceProviders: Map<number, LegalServiceProvider>;
+  private contactSubmissions: Map<number, ContactSubmission>;
   private userCurrentId: number;
   private providerCurrentId: number;
+  private contactSubmissionCurrentId: number;
 
   constructor() {
     this.users = new Map();
     this.legalServiceProviders = new Map();
+    this.contactSubmissions = new Map();
     this.userCurrentId = 1;
     this.providerCurrentId = 1;
+    this.contactSubmissionCurrentId = 1;
     
     // Initialize with sample legal service providers
     this.initializeSampleProviders();
+  }
+  
+  async createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission> {
+    const id = this.contactSubmissionCurrentId++;
+    const now = new Date();
+    const contactSubmission: ContactSubmission = {
+      ...submission,
+      id,
+      createdAt: now
+    };
+    this.contactSubmissions.set(id, contactSubmission);
+    return contactSubmission;
+  }
+  
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return Array.from(this.contactSubmissions.values());
   }
 
   async getUser(id: number): Promise<User | undefined> {
