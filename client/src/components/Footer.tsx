@@ -48,18 +48,18 @@ export default function Footer() {
             <h3 className="font-semibold mb-4 text-lg">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#">
-                  <a className="text-gray-600 hover:text-primary text-sm">Privacy Policy</a>
+                <Link href="#" className="text-gray-600 hover:text-primary text-sm">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#">
-                  <a className="text-gray-600 hover:text-primary text-sm">Terms of Service</a>
+                <Link href="#" className="text-gray-600 hover:text-primary text-sm">
+                  Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="#">
-                  <a className="text-gray-600 hover:text-primary text-sm">Cookie Policy</a>
+                <Link href="#" className="text-gray-600 hover:text-primary text-sm">
+                  Cookie Policy
                 </Link>
               </li>
             </ul>
