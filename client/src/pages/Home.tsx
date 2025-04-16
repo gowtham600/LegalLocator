@@ -4,10 +4,11 @@ import Footer from "@/components/Footer";
 import SearchForm from "@/components/SearchForm";
 import SearchRadius from "@/components/SearchRadius";
 import ResultsList from "@/components/ResultsList";
+import ServiceMap from "@/components/ServiceMap";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { type ProviderWithDistance } from "@shared/schema";
-import { CircleAlert, AlertCircle } from "lucide-react";
+import { CircleAlert, AlertCircle, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
@@ -129,11 +130,28 @@ export default function Home() {
             <SearchRadius radius={searchResults.radius} />
             
             {searchResults.providers.length > 0 ? (
-              <ResultsList 
-                providers={searchResults.providers} 
-                count={searchResults.count} 
-                radius={searchResults.radius} 
-              />
+              <>
+                <div className="max-w-4xl mx-auto mb-8">
+                  <div className="flex items-center text-primary mb-4">
+                    <MapPin className="h-5 w-5 mr-2" />
+                    <h3 className="text-lg font-medium">Service Providers Map</h3>
+                  </div>
+                  <ServiceMap 
+                    providers={searchResults.providers}
+                    radius={searchResults.radius}
+                    userLocation={{
+                      latitude: searchState.latitude || 0,
+                      longitude: searchState.longitude || 0
+                    }}
+                  />
+                </div>
+                
+                <ResultsList 
+                  providers={searchResults.providers} 
+                  count={searchResults.count} 
+                  radius={searchResults.radius} 
+                />
+              </>
             ) : (
               <div className="max-w-4xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
                 <div className="flex items-center text-yellow-800 mb-2">
