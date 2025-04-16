@@ -176,8 +176,12 @@ export class MemStorage implements IStorage {
       
       // Service type specialization bonus (if service type is specified and not "all")
       if (serviceType && serviceType !== "" && serviceType !== "all") {
-        const serviceTypeMatches = (services: string[]) => 
-          services.some(s => s.toLowerCase().includes(serviceType.toLowerCase()));
+        const serviceTypeMatches = (servicesStr: string) => {
+          // Parse the services string as JSON array
+          const services = JSON.parse(servicesStr);
+          return Array.isArray(services) && 
+            services.some((s: string) => s.toLowerCase().includes(serviceType.toLowerCase()));
+        };
         
         if (serviceTypeMatches(a.provider.services)) scoreA += 30;
         if (serviceTypeMatches(b.provider.services)) scoreB += 30;
@@ -189,7 +193,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleProviders() {
-    const sampleProviders: InsertLegalServiceProvider[] = [
+    // Create typed sample data - we'll convert arrays to strings during normalization
+    const sampleProviders = [
       {
         name: "Capital Law Associates",
         services: ["Family Law", "Corporate Law", "Real Estate Law"],
@@ -296,7 +301,17 @@ export class MemStorage implements IStorage {
     
     sampleProviders.forEach(provider => {
       const id = this.providerCurrentId++;
-      this.legalServiceProviders.set(id, { ...provider, id });
+      // Convert arrays to JSON strings and ensure nullable fields have proper null values
+      const normalizedProvider = {
+        ...provider,
+        id,
+        services: JSON.stringify(provider.services),
+        website: provider.website || null,
+        rating: provider.rating || null,
+        reviewCount: provider.reviewCount || null,
+        yearsExperience: provider.yearsExperience || null
+      };
+      this.legalServiceProviders.set(id, normalizedProvider);
     });
   }
 }

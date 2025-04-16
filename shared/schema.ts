@@ -21,7 +21,7 @@ export type User = typeof users.$inferSelect;
 export const legalServiceProviders = pgTable("legal_service_providers", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  services: text("services").array().notNull(),
+  services: text("services").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   website: text("website"),
