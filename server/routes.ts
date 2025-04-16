@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { searchRequestSchema } from "@shared/schema";
+import { searchRequestSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -61,6 +61,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Search error:", error);
       res.status(500).json({ message: "Failed to perform search" });
+    }
+  });
+
+  // Contact form submission endpoint
+  app.post("/api/contact", async (req, res) => {
+    try {
+      // Validate request body
+      const validatedData = insertContactSubmissionSchema.safeParse(req.body);
+      if (!validatedData.success) {
+        return res.status(400).json({ 
+          message: "Invalid contact form data", 
+          errors: validatedData.error.errors 
+        });
+      }
+      
+      const { data } = validatedData;
+      
+      // Save contact submission to database
+      const submission = await storage.createContactSubmission(data);
+      
+      res.status(201).json({
+        message: "Contact form submitted successfully",
+        submission
+      });
+    } catch (error) {
+      console.error("Contact form submission error:", error);
+      res.status(500).json({ message: "Failed to submit contact form" });
     }
   });
 
