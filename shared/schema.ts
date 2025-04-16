@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, numeric, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, numeric, jsonb, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -41,10 +41,29 @@ export const insertLegalServiceProviderSchema = createInsertSchema(legalServiceP
   id: true
 });
 
+// Contact form submissions table
+export const contactSubmissions = pgTable("contact_submissions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({
+  id: true,
+  createdAt: true
+});
+
+export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+
 // Define relationships between tables if needed in the future
 export const relations = {
   users: {},
-  legalServiceProviders: {}
+  legalServiceProviders: {},
+  contactSubmissions: {}
 };
 
 export type InsertLegalServiceProvider = z.infer<typeof insertLegalServiceProviderSchema>;
