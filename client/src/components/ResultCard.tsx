@@ -71,9 +71,12 @@ export default function ResultCard({ provider, rank }: ResultCardProps) {
               <h5 className="text-sm font-medium mb-1">Services Offered:</h5>
               <div className="flex flex-wrap gap-2">
                 {(() => {
-                  // Parse the services JSON string
                   try {
-                    const services = JSON.parse(data.services);
+                    // Handle both JSON string and array formats for backward compatibility
+                    const services = Array.isArray(data.services) 
+                      ? data.services 
+                      : JSON.parse(data.services);
+                      
                     return services.map((service: string, index: number) => (
                       <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                         {service}
