@@ -1,12 +1,15 @@
 import { 
   users, 
   legalServiceProviders,
+  contactSubmissions,
   type User, 
   type InsertUser, 
   type LegalServiceProvider, 
   type InsertLegalServiceProvider, 
   type SearchRequest, 
-  type ProviderWithDistance 
+  type ProviderWithDistance,
+  type ContactSubmission,
+  type InsertContactSubmission
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql } from "drizzle-orm";
@@ -177,6 +180,16 @@ export class DatabaseStorage implements IStorage {
       // Return comparison (higher score first)
       return scoreB - scoreA;
     });
+  }
+
+  // Contact form methods
+  async createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission> {
+    const result = await db.insert(contactSubmissions).values(submission).returning();
+    return result[0];
+  }
+  
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return await db.select().from(contactSubmissions);
   }
 
   private async initializeSampleProviders() {
