@@ -70,11 +70,23 @@ export default function ResultCard({ provider, rank }: ResultCardProps) {
             <div className="mb-4">
               <h5 className="text-sm font-medium mb-1">Services Offered:</h5>
               <div className="flex flex-wrap gap-2">
-                {data.services.map((service, index) => (
-                  <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                    {service}
-                  </span>
-                ))}
+                {(() => {
+                  // Parse the services JSON string
+                  try {
+                    const services = JSON.parse(data.services);
+                    return services.map((service: string, index: number) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                        {service}
+                      </span>
+                    ));
+                  } catch (e) {
+                    return (
+                      <span className="text-xs text-gray-500">
+                        No services listed
+                      </span>
+                    );
+                  }
+                })()}
               </div>
             </div>
             
