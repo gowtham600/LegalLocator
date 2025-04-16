@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, varchar, numeric, PgArray } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, numeric, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -21,7 +21,7 @@ export type User = typeof users.$inferSelect;
 export const legalServiceProviders = pgTable("legal_service_providers", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  services: text("services").notNull(),
+  services: jsonb("services").notNull().$type<string[]>(), // Store as JSON array
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   website: text("website"),
@@ -40,6 +40,12 @@ export const legalServiceProviders = pgTable("legal_service_providers", {
 export const insertLegalServiceProviderSchema = createInsertSchema(legalServiceProviders).omit({
   id: true
 });
+
+// Define relationships between tables if needed in the future
+export const relations = {
+  users: {},
+  legalServiceProviders: {}
+};
 
 export type InsertLegalServiceProvider = z.infer<typeof insertLegalServiceProviderSchema>;
 export type LegalServiceProvider = typeof legalServiceProviders.$inferSelect;

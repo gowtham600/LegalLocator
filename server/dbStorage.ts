@@ -1,38 +1,22 @@
 import { 
   users, 
+  legalServiceProviders,
   type User, 
   type InsertUser, 
   type LegalServiceProvider, 
   type InsertLegalServiceProvider, 
   type SearchRequest, 
-  type ProviderWithDistance
+  type ProviderWithDistance 
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, sql } from "drizzle-orm";
+import { IStorage } from "./storage";
 
 // Constants for search radii
 const PRIMARY_RADIUS_KM = 30;
 const FALLBACK_RADIUS_KM = 60;
 
-// Modify the interface with CRUD methods needed
-export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  
-  // Legal service provider methods
-  getLegalServiceProviders(): Promise<LegalServiceProvider[]>;
-  getLegalServiceProviderById(id: number): Promise<LegalServiceProvider | undefined>;
-  createLegalServiceProvider(provider: InsertLegalServiceProvider): Promise<LegalServiceProvider>;
-  
-  // Search methods
-  findNearbyProviders(searchRequest: SearchRequest, radius: number): Promise<ProviderWithDistance[]>;
-  searchWithFallback(searchRequest: SearchRequest): Promise<{
-    providers: ProviderWithDistance[],
-    radius: number
-  }>;
-  rankProviders(providers: ProviderWithDistance[], serviceType: string): ProviderWithDistance[];
-}
-
-// Haversine formula for calculating distance between two points on the earth
+// Function to calculate distance between coordinates
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Radius of the earth in km
   const dLat = deg2rad(lat2 - lat1);
@@ -40,7 +24,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   const a = 
     Math.sin(dLat/2) * Math.sin(dLat/2) +
     Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
+    Math.sin(dLon/2) * Math.sin(dLon/2); 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
   const distance = R * c; // Distance in km
   return distance;
@@ -50,84 +34,72 @@ function deg2rad(deg: number): number {
   return deg * (Math.PI/180);
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private legalServiceProviders: Map<number, LegalServiceProvider>;
-  private userCurrentId: number;
-  private providerCurrentId: number;
-
+export class DatabaseStorage implements IStorage {
+  
   constructor() {
-    this.users = new Map();
-    this.legalServiceProviders = new Map();
-    this.userCurrentId = 1;
-    this.providerCurrentId = 1;
-    
-    // Initialize with sample legal service providers
+    // Initialize sample data if needed
     this.initializeSampleProviders();
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const result = await db.select().from(users).where(eq(users.id, id));
+    return result[0];
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const result = await db.select().from(users).where(eq(users.username, username));
+    return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userCurrentId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+    const result = await db.insert(users).values(insertUser).returning();
+    return result[0];
   }
 
   async getLegalServiceProviders(): Promise<LegalServiceProvider[]> {
-    return Array.from(this.legalServiceProviders.values());
+    return await db.select().from(legalServiceProviders);
   }
 
   async getLegalServiceProviderById(id: number): Promise<LegalServiceProvider | undefined> {
-    return this.legalServiceProviders.get(id);
+    const result = await db.select().from(legalServiceProviders).where(eq(legalServiceProviders.id, id));
+    return result[0];
   }
 
-  async createLegalServiceProvider(insertProvider: InsertLegalServiceProvider): Promise<LegalServiceProvider> {
-    const id = this.providerCurrentId++;
-    const provider: LegalServiceProvider = { ...insertProvider, id };
-    this.legalServiceProviders.set(id, provider);
-    return provider;
+  async createLegalServiceProvider(provider: InsertLegalServiceProvider): Promise<LegalServiceProvider> {
+    const result = await db.insert(legalServiceProviders).values(provider).returning();
+    return result[0];
   }
 
   async findNearbyProviders(searchRequest: SearchRequest, radius: number): Promise<ProviderWithDistance[]> {
-    const providers = Array.from(this.legalServiceProviders.values());
-    const { latitude, longitude, serviceType } = searchRequest;
+    // Get all providers from database
+    const allProviders = await this.getLegalServiceProviders();
     
-    const providersWithDistance = providers.map(provider => {
-      const distance = calculateDistance(
-        Number(latitude), 
-        Number(longitude), 
-        Number(provider.latitude), 
+    // Calculate distance for each provider
+    const providersWithDistance: ProviderWithDistance[] = allProviders.map(provider => ({
+      provider,
+      distance: calculateDistance(
+        searchRequest.latitude,
+        searchRequest.longitude,
+        Number(provider.latitude),
         Number(provider.longitude)
-      );
-      
-      return { provider, distance };
-    });
+      )
+    }));
     
     // Filter by distance
     const nearbyProviders = providersWithDistance.filter(item => item.distance <= radius);
     
     // Filter by service type if specified
-    if (serviceType && serviceType !== "" && serviceType !== "all") {
+    if (searchRequest.serviceType && searchRequest.serviceType !== "" && searchRequest.serviceType !== "all") {
       return nearbyProviders.filter(item => {
         try {
-          // Parse JSON string to get services array
-          const services = JSON.parse(item.provider.services);
+          // Access services directly as an array since we're using jsonb in PostgreSQL
+          const services = item.provider.services;
           return Array.isArray(services) && 
             services.some((service: string) => 
-              service.toLowerCase().includes(serviceType.toLowerCase())
+              service.toLowerCase().includes(searchRequest.serviceType!.toLowerCase())
             );
         } catch (error) {
-          console.error("Error parsing services:", error);
+          console.error("Error with services data:", error);
           return false;
         }
       });
@@ -184,15 +156,22 @@ export class MemStorage implements IStorage {
       
       // Service type specialization bonus (if service type is specified and not "all")
       if (serviceType && serviceType !== "" && serviceType !== "all") {
-        const serviceTypeMatches = (servicesStr: string) => {
-          // Parse the services string as JSON array
-          const services = JSON.parse(servicesStr);
-          return Array.isArray(services) && 
-            services.some((s: string) => s.toLowerCase().includes(serviceType.toLowerCase()));
-        };
-        
-        if (serviceTypeMatches(a.provider.services)) scoreA += 30;
-        if (serviceTypeMatches(b.provider.services)) scoreB += 30;
+        try {
+          const servicesA = a.provider.services;
+          const servicesB = b.provider.services;
+          
+          if (Array.isArray(servicesA) && 
+              servicesA.some((s: string) => s.toLowerCase().includes(serviceType.toLowerCase()))) {
+            scoreA += 30;
+          }
+          
+          if (Array.isArray(servicesB) && 
+              servicesB.some((s: string) => s.toLowerCase().includes(serviceType.toLowerCase()))) {
+            scoreB += 30;
+          }
+        } catch (error) {
+          console.error("Error in service ranking:", error);
+        }
       }
       
       // Return comparison (higher score first)
@@ -200,8 +179,18 @@ export class MemStorage implements IStorage {
     });
   }
 
-  private initializeSampleProviders() {
-    // Create typed sample data - we'll convert arrays to strings during normalization
+  private async initializeSampleProviders() {
+    // Check if we already have providers
+    const existingProviders = await db.select().from(legalServiceProviders);
+    
+    if (existingProviders.length > 0) {
+      console.log("Sample providers already exist in the database.");
+      return;
+    }
+    
+    console.log("Initializing sample providers in the database...");
+    
+    // Create sample data
     const sampleProviders = [
       {
         name: "Capital Law Associates",
@@ -307,24 +296,20 @@ export class MemStorage implements IStorage {
       }
     ];
     
-    sampleProviders.forEach(provider => {
-      const id = this.providerCurrentId++;
-      // Convert arrays to JSON strings and ensure nullable fields have proper null values
-      const normalizedProvider = {
-        ...provider,
-        id,
-        services: JSON.stringify(provider.services),
-        website: provider.website || null,
-        rating: provider.rating || null,
-        reviewCount: provider.reviewCount || null,
-        yearsExperience: provider.yearsExperience || null
-      };
-      this.legalServiceProviders.set(id, normalizedProvider);
-    });
+    // Insert sample providers into database
+    try {
+      for (const provider of sampleProviders) {
+        await this.createLegalServiceProvider({
+          ...provider,
+          website: provider.website || null,
+          rating: provider.rating || null,
+          reviewCount: provider.reviewCount || null,
+          yearsExperience: provider.yearsExperience || null
+        });
+      }
+      console.log("Sample providers initialized successfully.");
+    } catch (error) {
+      console.error("Error initializing sample providers:", error);
+    }
   }
 }
-
-// Select which storage implementation to use
-// We're using DatabaseStorage now that we have a database configured
-import { DatabaseStorage } from "./dbStorage";
-export const storage = new DatabaseStorage();
