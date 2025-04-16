@@ -30,6 +30,10 @@ export interface IStorage {
     radius: number
   }>;
   rankProviders(providers: ProviderWithDistance[], serviceType: string): ProviderWithDistance[];
+  
+  // Contact form methods
+  createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
+  getContactSubmissions(): Promise<ContactSubmission[]>;
 }
 
 // Haversine formula for calculating distance between two points on the earth
